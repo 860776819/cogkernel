@@ -1,11 +1,20 @@
 # Worm-0：持续运行的认知内核 v0
 
+> **状态（2026-09-13）：Worm-0 已冻结（tag `worm0-frozen`），不再修改。**
+> 阶段结论：E0（FINDINGS_v0）→ 审计（PRESET_AUDIT）→ M0-minus 减法消融与测量补遗
+> （FINDINGS_M0MINUS，含对早前结论的两轮修正）。最终图景：所有像认知的东西都有程序员指纹；
+> 内核连续状态的有效足迹极小（与旧状态余弦中位 0.975–0.998），"自发回忆"作为事件不可定义。
+> 下一阶段方向：**Soul-0**（「存在域 Existence Domain」/「存在边界 Existence Boundary」）
+> ——当前仅为概念阶段，未设计、未实现。
+
 研究"代码怎样产生'想'"：一个外界输入只是扰动、不是启动信号的认知内核。
 即使没有新信息，记忆再激活、世界模型预测、未解决的误差、学习进度也持续改变内部状态。
 
 - 研究问题、公理、判据：[RESEARCH_PLAN.md](RESEARCH_PLAN.md)
 - 先行者源码调查：[PRIOR_WORK.md](PRIOR_WORK.md)
 - v0 实验结论：[FINDINGS_v0.md](FINDINGS_v0.md)
+- 人工预置机制审计：[PRESET_AUDIT.md](PRESET_AUDIT.md)
+- M0-minus 减法实验与收档：[M0_MINUS_DESIGN.md](M0_MINUS_DESIGN.md) / [FINDINGS_M0MINUS.md](FINDINGS_M0MINUS.md)
 
 ## 运行
 
