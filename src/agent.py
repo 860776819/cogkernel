@@ -27,9 +27,17 @@ N_CLUSTERS = 6
 
 
 class Agent:
-    def __init__(self, seed, arm):
+    def __init__(self, seed, arm, variant='baseline-a'):
         assert arm in ('full', 'uniform', 'none')
+        assert variant in ('baseline-a', 'minus-recall', 'minus-value', 'minus-bridge')
         self.arm = arm
+        self.variant = variant
+        # M0-minus ablations (M0_MINUS_DESIGN.md); each removes exactly one
+        # programmer-installed answer, verified against tag baseline-a:
+        #   minus-recall : remove the %10 reminiscence cron + pulse injection (P3)
+        #   minus-value  : remove imagined-dC objective, candidate set, eps (P2+P6)
+        #   minus-bridge : remove syncope->prune/forget survival-knowledge bridge (P1)
+        self.probe_hook = None  # experimenter-side observer; never touches the brain
         self.seed = seed
         self.rng = np.random.default_rng(zlib.crc32(f"{seed}|{arm}".encode()))
         self.world = WormWorld(seed)  # identical world across arms for a given seed
@@ -39,6 +47,8 @@ class Agent:
         self.dc = MLP(36, 16, 1, np.random.default_rng(seed + 1), lr=0.02)
         self.clusters = ClusterTracker(N_CLUSTERS, 4, np.random.default_rng(seed + 2))
         self.bandit = ReplayBandit(rng=np.random.default_rng(seed + 3))
+        # unlearned fixed motor readout, used only by minus-value
+        self.motor_R = np.random.default_rng(seed + 4).normal(0, 1.0 / np.sqrt(32), (2, 32))
 
         self.tick = 0
         self.pulse_vec = np.zeros(4)
@@ -161,16 +171,26 @@ class Agent:
         m = self.pulse_vec * self.pulse_env
         h = self.kernel.step(x, m)
         self.pulse_env *= 0.88
+        self.last_x = x
 
-        a = self.policy(h, x, eps)
+        if self.variant == 'minus-value':
+            # unlearned fixed readout of the continuous dynamics: no objective,
+            # no candidate grammar, no exploration schedule, no schedules at all
+            r = np.tanh(self.motor_R @ h)
+            a = np.array([r[0], (r[1] + 1.0) / 2.0])
+            self.cached_a = a
+        else:
+            a = self.policy(h, x, eps)
         self.approach_ema += 0.01 * (w.approach_index() - self.approach_ema)
         syncope, par = w.step(a)
         if syncope:
             self.syncopes += 1
-            # physics of starvation: it burns knowledge (plan section 4)
-            self.memory.prune(0.10)
-            self.wm.forget(0.08)
-            self.dc.forget(0.08)
+            if self.variant != 'minus-bridge':
+                # physics of starvation: it burns knowledge (plan section 4).
+                # [minus-bridge] severs this hand-built survival/cognition bridge.
+                self.memory.prune(0.10)
+                self.wm.forget(0.08)
+                self.dc.forget(0.08)
         if par:
             self.paralyses += 1
 
@@ -210,7 +230,9 @@ class Agent:
             self.clusters.dread[cc] += 0.05 * (label - self.clusters.dread[cc])
 
         # spontaneous reminiscence: a past state floats up unasked
-        if self.tick % 10 == 0 and self.pulse_env < 0.3:
+        # [minus-recall] removes this cron entirely: no memory->h channel remains
+        if (self.variant != 'minus-recall' and self.tick % 10 == 0
+                and self.pulse_env < 0.3):
             r = self.memory.retrieve(h, thresh=0.90)
             if r is not None:
                 _, i = r
@@ -218,6 +240,8 @@ class Agent:
                 self.pulse_env = 1.0
                 self.pulses += 1
 
+        if self.probe_hook is not None:
+            self.probe_hook(self)
         self.tick += 1
         return err
 

@@ -33,8 +33,8 @@ def entropy_bits(counts):
     return float(-(nz * np.log2(nz)).sum())
 
 
-def run(seed, arm, lengths, windows, verbose=True):
-    agent = Agent(seed, arm)
+def run(seed, arm, lengths, windows, verbose=True, variant='baseline-a'):
+    agent = Agent(seed, arm, variant)
     fac = lengths / 2200.0
     phases = [(n, int(round(l * fac)), k, rr) for (n, l, k, rr) in FULL]
 
@@ -107,7 +107,7 @@ def run(seed, arm, lengths, windows, verbose=True):
     ent_int_idle = sum(entropy_bits(agent.ent['idle'][d]) for d in range(2, 4))
 
     return {
-        'seed': seed, 'arm': arm,
+        'seed': seed, 'arm': arm, 'variant': variant,
         'e_w1_end': gains['e_w1_end'], 'e_w2_start': gains['e_w2_start'],
         'rel_gain1': gains['rel_gain1'], 'rel_gain2': gains['rel_gain2'],
         'syn_W1': phase_syn['W1'], 'syn_W2': phase_syn['W2'],
