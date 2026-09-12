@@ -1,0 +1,27 @@
+========================================================================
+E0 offline-thinking experiment   (FULL, 5 seeds/arm)
+========================================================================
+metric                                full       uniform          none
+rel_gain1                      -0.062±0.06    0.012±0.15    0.067±0.15
+rel_gain2                      -0.003±0.04   -0.012±0.07   -0.040±0.08
+syn_W1                          1.800±2.64    3.800±5.15    3.600±4.03
+syn_W2                          0.000±0.00    2.200±4.40    1.800±3.60
+syn_W3                          0.000±0.00    1.000±2.00    2.400±4.80
+syn_W4                          0.000±0.00    0.400±0.80    2.000±4.00
+recovery_W3                   57.800±28.36 191.400±216.32 771.600±914.54
+appr_W1                        -0.006±0.13    0.063±0.24    0.070±0.15
+appr_W2                         0.039±0.20    0.067±0.27    0.093±0.19
+appr_W3                         0.223±0.23    0.098±0.33   -0.026±0.24
+appr_W4                         0.233±0.25    0.087±0.33   -0.031±0.25
+ent_ext_idle                    0.000±0.00    0.000±0.00    0.000±0.00
+ent_ext_wake                    5.002±0.60    4.506±1.17    4.039±1.62
+cos_before                      0.116±0.28    0.549±0.17    0.000±0.00
+cos_during                      0.258±0.29    0.581±0.18    0.000±0.00
+------------------------------------------------------------------------
+[FAIL] S1  offline gain (full vs none)    rel_gain1 full=-0.062 uniform=0.012 none=0.067
+[FAIL] S1' selection value (full vs uniform) diff=-0.074
+[FAIL] S2  behavior change (syncope drop) reduction full=1.80 none=1.80
+[PASS] S3  strategy transfer (W3 recovery) recovery_W3 full=58 none=772
+[PASS] S4  structured idle (pulse cos)    cos during=0.258 before=0.116 delta=0.143
+------------------------------------------------------------------------
+S0  info audit: EXTEROceptive entropy bits/tick  wake=5.00  idle=0.00  (idle~0 means gains cannot come from new info; intero idle=0.42)
