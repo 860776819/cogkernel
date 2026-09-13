@@ -1,0 +1,7 @@
+budget,sym_recovered,asym_recovered,peak_transient_divergence,fate_divergent
+0.1,True,True,0.07071,False
+0.2,True,True,0.14142,False
+0.3,True,True,0.21213,False
+0.4,True,True,0.29762,False
+0.42,True,False,0.59508,True
+0.420782,True,False,0.59508,True
