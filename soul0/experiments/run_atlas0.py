@@ -23,7 +23,11 @@ import json
 import os
 import sys
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from pathlib import Path
+
+REPO_ROOT = Path(__file__).resolve().parents[2]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
 
 import numpy as np
 
@@ -31,9 +35,9 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
-from proto1 import LAM, K, N, A2, MU, R0, EPSES, G, rk4, deriv
+from soul0.core.proto1 import LAM, K, N, A2, MU, R0, EPSES, G, rk4, deriv
 
-OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'results', 'soul0_atlas0')
+OUT = str(REPO_ROOT / 'results' / 'soul0_atlas0')
 THETA = 0.05
 A2F = 0.420782
 R_EQ = LAM * A2F / MU          # E0-equilibrium r; used only as an initial guess

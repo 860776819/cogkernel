@@ -1,7 +1,7 @@
 # SOUL0_ATLAS0_FINDINGS.md — 状态空间图谱观察记录（v3，二轮审查修正后）
 
-> 2026-09-13。设计：SOUL0_ATLAS0_DESIGN.md；实现：soul0/run_atlas0.py（v3）+
-> soul0/atlas0_analyze.py（v3）。**只记录观察事实，不解释成认知、记忆、价值、器官或
+> 2026-09-13。设计：SOUL0_ATLAS0_DESIGN.md；实现：soul0/experiments/run_atlas0.py（v3）+
+> soul0/analysis/atlas0_analyze.py（v3）。**只记录观察事实，不解释成认知、记忆、价值、器官或
 > 主体结构。**区域使用无意义编号。
 > 版本史：v1 的体素整数 key 比较（0.89–0.90 / 0.05–0.06）与 v2 的"同点一致率"
 > （0.877–0.916，(2ia,2ib,2ir) 映射未做物理缩放）**均撤回**；Map B 自 v2 起从各 ε

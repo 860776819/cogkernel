@@ -17,18 +17,21 @@ import json
 import os
 import sys
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from pathlib import Path
+
+REPO_ROOT = Path(__file__).resolve().parents[2]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
 
 import numpy as np
 
 from plotly.offline import get_plotlyjs
 
-from proto1 import EPSES, R0
-from run_atlas0 import (OUT as ATLAS_OUT, A2F, find_fixed_point,
+from soul0.core.proto1 import EPSES, R0
+from soul0.experiments.run_atlas0 import (OUT as ATLAS_OUT, A2F, find_fixed_point,
                         r_bound, R_EQ)
 
-HERE = os.path.dirname(os.path.abspath(__file__))
-OBS = os.path.join(HERE, '..', 'results', 'soul0_observatory')
+OBS = str(REPO_ROOT / 'results' / 'soul0_observatory')
 N_ERO = 21
 T_TRAJ = 300.0
 DT = 0.02
@@ -76,7 +79,7 @@ def rk4_step(S, eps):
 
 
 def deriv(S, eps):
-    from proto1 import LAM, K, MU
+    from soul0.core.proto1 import LAM, K, MU
     a, b, m, r = S[0], S[1], S[2], S[3]
     p = (1.0 + eps * np.tanh(r / R0)) * K * a * b * m
     return np.vstack([-LAM * a + p, -LAM * b + p,

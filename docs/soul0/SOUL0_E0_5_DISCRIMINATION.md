@@ -1,7 +1,7 @@
 # SOUL0_E0_5_DISCRIMINATION.md — Proto-0 内部差异审计
 
-> 性质：审计，不新增任何机制。`soul0/proto0.py` 动力学零改动（git 可证：本提交对动力学
-> 文件无 diff）；新增仅为分析脚本 `soul0/e05_discrimination.py` 与结果文件。
+> 性质：审计，不新增任何机制。`soul0/core/proto0.py` 动力学零改动（git 可证：本提交对动力学
+> 文件无 diff）；新增仅为分析脚本 `soul0/experiments/e05_discrimination.py` 与结果文件。
 > 目的唯一：确认 E0 是否已经存在**"同等外界扰动 → 因自身组织结构不同而产生不同内部
 > 暂态响应"**。日期：2026-09-13。状态：待审查。
 > 配套修正：SOUL0_NORMATIVITY_SURVEY.md 两处定义修正（B 门槛=暂态差分而非打破终局性；
@@ -86,6 +86,6 @@ A→暂态 B 的实测内容。
 
 ## 6. 产物
 
-- `soul0/e05_discrimination.py`（分析脚本；proto0.py 未改动）
+- `soul0/experiments/e05_discrimination.py`（分析脚本；proto0.py 未改动）
 - `results/soul0_e05/`：pair_timeseries.csv、distribution_scan.csv、budget_scan.csv、
   figure_e05.png（配对暂态、通量对比、分布扫描、预算-差分曲线）

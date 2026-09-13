@@ -13,7 +13,11 @@ import csv
 import os
 import sys
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from pathlib import Path
+
+REPO_ROOT = Path(__file__).resolve().parents[2]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
 
 import numpy as np
 
@@ -21,12 +25,12 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
-import proto0
-from proto1 import (LAM, K, N, A2, MU, R0, EPSES, G, deriv, rk4,
+from soul0.core import proto0
+from soul0.core.proto1 import (LAM, K, N, A2, MU, R0, EPSES, G, deriv, rk4,
                     simulate_batch, simulate1, deriv_clamped,
                     simulate_clamped, frozen_r_boundary)
 
-OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'results', 'soul0_e1')
+OUT = str(REPO_ROOT / 'results' / 'soul0_e1')
 EQ = np.array([A2, A2, N - 2 * A2, LAM * A2 / MU])   # equilibrium guess incl. r
 T_SHORT, T_LONG = 150.0, 600.0
 DT = 0.01

@@ -82,6 +82,6 @@
 
 ## 七、产物
 
-`SOUL0_ATLAS0_DESIGN.md`（本文）、`soul0/run_atlas0.py`、`results/soul0_atlas0/`
+`SOUL0_ATLAS0_DESIGN.md`（本文）、`soul0/experiments/run_atlas0.py`、`results/soul0_atlas0/`
 （各 ε 的 fate 网格 CSV、边界清单、reachable 占用、图）、`SOUL0_ATLAS0_FINDINGS.md`
 （只记观察事实）。

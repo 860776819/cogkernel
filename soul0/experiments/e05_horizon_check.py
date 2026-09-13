@@ -9,13 +9,17 @@ import csv
 import os
 import sys
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from pathlib import Path
+
+REPO_ROOT = Path(__file__).resolve().parents[2]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
 
 import numpy as np
 
-from proto0 import simulate
+from soul0.core.proto0 import simulate
 
-OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'results', 'soul0_e05')
+OUT = str(REPO_ROOT / 'results' / 'soul0_e05')
 A2 = 0.420782
 N = 1.0
 EQ = np.array([A2, A2, N - 2 * A2])

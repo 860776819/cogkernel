@@ -84,7 +84,7 @@
 
 ## 5. 产物
 
-`soul0/proto0.py`（世界/原体/观察者仪器三段式）、`soul0/run_e0.py`（七组实验+扫描+图）、
+`soul0/core/proto0.py`（世界/原体/观察者仪器三段式）、`soul0/experiments/run_e0.py`（七组实验+扫描+图）、
 `results/soul0_e0/`（时序 CSV、扫描 CSV、figure_e0.png：内部变量时间序列、侵蚀时刻、
 恢复或消散的轨迹、切断对照、涌现分离线）。
 

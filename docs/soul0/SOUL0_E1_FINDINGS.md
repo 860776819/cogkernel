@@ -2,7 +2,7 @@
 
 > 2026-09-13。设计文档：SOUL0_E1_REGULATION_DESIGN.md（预注册常数：μ=0.02、
 > ε∈{+0.25, 0, −0.25}、r₀=λ·a₂/μ≈4.2078；实验中未调整任何参数）。
-> 实现：`soul0/proto1.py`（4 维动力学，E0 守恒律保持）、`soul0/run_e1.py`（验证电池 A–H）。
+> 实现：`soul0/core/proto1.py`（4 维动力学，E0 守恒律保持）、`soul0/experiments/run_e1.py`（验证电池 A–H）。
 > 产物：`results/soul0_e1/`（3 个 fate_scan CSV、matched_states.csv、figure_e1.png）。
 
 ## 判定：E1 五条最低判据全部通过

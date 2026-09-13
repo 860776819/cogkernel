@@ -3,7 +3,11 @@ import csv
 import os
 import sys
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from pathlib import Path
+
+REPO_ROOT = Path(__file__).resolve().parents[2]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
 
 import numpy as np
 
@@ -11,9 +15,9 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
-from proto0 import LAM, K, N, THETA, A_STABLE, RECOVER_LEVEL, simulate
+from soul0.core.proto0 import LAM, K, N, THETA, A_STABLE, RECOVER_LEVEL, simulate
 
-OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'results', 'soul0_e0')
+OUT = str(REPO_ROOT / 'results' / 'soul0_e0')
 EQ = np.array([A_STABLE, A_STABLE, N - 2 * A_STABLE])   # sustainable fixed point
 T_P = 25.0       # erosion time in the perturbed arms
 T_EXT = 800.0    # forward-dynamics horizon proving (non-)re-establishment
