@@ -153,7 +153,7 @@ def natural_r_range(eps):
     rs = []
     for budget, split in [(0.420782, 0.5), (0.420782, 0.9), (0.420782, 0.0),
                           (0.378522, 0.9), (0.378522, 0.1)]:
-        _, tr = simulate_batch(np.concatenate([erode_state(0.420782, split), [4.2]]),
+        _, tr = simulate_batch(np.concatenate([erode_state(budget, split), [4.2]]),
                                300.0, 0.01, eps=eps)
         rs += [tr[:, 0, 3].min(), tr[:, 0, 3].max()]
     return min(rs), max(rs)
@@ -184,7 +184,43 @@ def check_F(eps, r_values, rho_grid):
     return rows, n_div > 0
 
 
+# ---------------- F: horizon recheck (no parameter changes) ----------------
+def f_horizon_recheck(eps, rho_grid, r_values, horizons=((150.0, 0.01), (600.0, 0.01),
+                                                         (2400.0, 0.02))):
+    """Re-classify the same rho x r grid at longer horizons. Report whether the
+    fate-divergent rho set drifts. Original parameters and r grid unchanged."""
+    out = {}
+    for T, dt in horizons:
+        init, meta = [], []
+        for rho in rho_grid:
+            x = (1.0 - rho) * A2
+            st = np.array([x, x, 1.0 - 2.0 * x])
+            for r in r_values:
+                init.append(np.concatenate([st, [r]]))
+                meta.append((float(rho), float(r)))
+        S = np.array(init).T
+        n = int(round(T / dt))
+        for _ in range(n):
+            S = rk4(S, dt, eps)
+        fin = S.T
+        fates = np.min(fin[:, :2], axis=1) >= 0.5 * A2
+        per_rho = {}
+        for (rho, r), f in zip(meta, fates):
+            per_rho.setdefault(rho, []).append(bool(f))
+        div = sorted(rho for rho, fs in per_rho.items() if len(set(fs)) > 1)
+        out[T] = div
+    stable = all(out[T] == out[150.0] for T, _ in horizons)
+    for T, _ in horizons:
+        print(f"F horizon recheck (eps={eps:+.2f}) T={T:6.0f}: fate-divergent rho = "
+              f"{[round(x, 3) for x in out[T]]}")
+    print(f"   stable across horizons: {stable}")
+    return out, stable
+
+
 # ---------------- G: Jacobian spectrum ----------------
+ZERO_TOL = 1e-4   # conservation zero-mode: |Re eig| below this = neutral mass mode
+
+
 def check_G(eps):
     # fixed point: long free run from several starts, collect converged states
     fps = []
@@ -198,7 +234,8 @@ def check_G(eps):
         if np.all(np.abs(deriv(fp[:, None], eps)[:, 0]) < 1e-6) and fp[:3].sum() > 0.5:
             if not any(np.linalg.norm(fp - f) < 1e-3 for f in fps):
                 fps.append(fp)
-    print(f"G Jacobian (eps={eps:+.2f}): {len(fps)} distinct fixed point(s)")
+    print(f"G Jacobian (eps={eps:+.2f}): {len(fps)} positive nonzero fixed point(s) "
+          f"found within the N=1 conservation manifold (this search)")
     specs = []
     for fp in fps:
         J = np.empty((4, 4))
@@ -207,15 +244,18 @@ def check_G(eps):
             J[:, j] = (deriv(fp[:, None] + e[:, None], eps)[:, 0]
                        - deriv(fp[:, None] - e[:, None], eps)[:, 0]) / 2e-6
         ev, evec = np.linalg.eig(J)
-        order = np.argsort([-z.real for z in ev])
-        ev_s = ev[order]
-        print("   eigenvalues: " + "  ".join(f"{z.real:+.4f}{z.imag:+.4f}j" for z in ev_s))
-        slow_i = int(np.argmax([z.real for z in ev]))
-        v = np.abs(evec[:, slow_i]); v = v / v.sum()
-        specs.append((ev_s, float(v[3])))
-        print(f"   slowest mode: Re={ev[slow_i].real:+.4f} Im={ev[slow_i].imag:+.4f}  "
-              f"r-direction weight={v[3]:.3f}  (mu={MU})  "
-              f"stable={all(z.real < 0 for z in ev)}")
+        zero = [z for z in ev if abs(z.real) < ZERO_TOL and abs(z.imag) < ZERO_TOL]
+        nonzero = [z for z in ev if not (abs(z.real) < ZERO_TOL and abs(z.imag) < ZERO_TOL)]
+        slow = max(nonzero, key=lambda z: z.real)   # stable: closest to 0 from below
+        v = np.abs(evec[:, list(ev).index(slow)]); v = v / v.sum()
+        stable_manifold = all(z.real < 0 for z in nonzero)
+        print(f"   conservation zero-mode(s): {len(zero)} "
+              f"(|Re| < {ZERO_TOL}; mass conservation, neutral)")
+        print(f"   slow NONZERO mode: Re={slow.real:+.5f}  r-direction "
+              f"weight={v[3]:.3f}  (mu={MU})  "
+              f"stable within N=1 manifold: {stable_manifold}  "
+              f"[full 4D system carries the neutral conservation zero-mode]")
+        specs.append((slow.real, float(v[3]), stable_manifold, len(zero)))
     return specs
 
 
@@ -247,8 +287,10 @@ def main():
         rho_grid = np.linspace(0.70, 0.90, 41)   # frozen-r diagnostic disagreement zone
         rows_e = check_E(eps, np.linspace(0.0, 10.0, 11))
         fate_rows, fate_div = check_F(eps, r_wide, rho_grid)
-        fps = check_G(eps)
-        rows.append((eps, rows_e, fate_div, fps))
+        specs = check_G(eps)
+        horizon_out, horizon_stable = f_horizon_recheck(eps, rho_grid, r_wide)
+        print(f"   [eps={eps:+.2f}] horizon-stable fate bifurcation: {horizon_stable}")
+        rows.append((eps, rows_e, fate_div, specs, horizon_out, horizon_stable))
         with open(os.path.join(OUT, f'fate_scan_eps{eps:+.2f}.csv'), 'w', newline='',
                   encoding='utf-8') as f:
             w = csv.writer(f)
