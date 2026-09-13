@@ -115,6 +115,39 @@ def main():
         print(f"budget={B:.3f}: sym recovered={recS}  asym recovered={recA}  "
               f"peak divergence={d.max():.4f}  fate-divergent={recS != recA}")
 
+    # ---- endpoint refinement: bisect the fate boundary near split=0 and 1 ----
+    def recovered_at(split, budget=A2):
+        d_b = budget * split
+        d_a = budget - d_b
+        d_a = min(d_a, EQ[0]); d_b = min(d_b, EQ[1])
+        st = EQ.copy(); st[0] -= d_a; st[1] -= d_b; st[2] += d_a + d_b
+        _, traj, _ = run_from(st)
+        return bool(np.min(traj[-1, :2]) >= RECOVER_LEVEL)
+
+    def bisect(lo, hi, lo_rec):
+        """lo recovered=lo_rec, hi recovered=(not lo_rec); returns bracket."""
+        for _ in range(20):
+            if hi - lo < 1e-4:
+                break
+            mid = 0.5 * (lo + hi)
+            if recovered_at(mid) == lo_rec:
+                lo = mid
+            else:
+                hi = mid
+        return lo, hi
+
+    lo1, hi1 = bisect(0.0, 0.025, lo_rec=False)   # dissipated at 0, recovered at 0.025
+    lo2, hi2 = bisect(0.975, 1.0, lo_rec=True)    # recovered at 0.975, dissipated at 1.0
+    print(f"endpoint refinement: dissipation boundary near split=0 bracketed in "
+          f"[{lo1:.5f}, {hi1:.5f}]  (mirror near split=1: [{lo2:.5f}, {hi2:.5f}], "
+          f"mirror check 1-hi1={1-hi1:.5f}, 1-lo1={1-lo1:.5f})")
+    with open(os.path.join(OUT, 'boundary_refinement.csv'), 'w', newline='',
+              encoding='utf-8') as f:
+        w = csv.writer(f)
+        w.writerow(['side', 'lo', 'hi', 'recovered_at_lo'])
+        w.writerow(['near_0', f"{lo1:.6f}", f"{hi1:.6f}", False])
+        w.writerow(['near_1', f"{lo2:.6f}", f"{hi2:.6f}", True])
+
     # ---- artifacts ----
     with open(os.path.join(OUT, 'pair_timeseries.csv'), 'w', newline='',
               encoding='utf-8') as f:

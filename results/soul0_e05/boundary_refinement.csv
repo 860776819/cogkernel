@@ -1,0 +1,3 @@
+side,lo,hi,recovered_at_lo
+near_0,0.009961,0.010059,False
+near_1,0.989941,0.990039,True
