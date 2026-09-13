@@ -113,67 +113,93 @@ def grid_index(pts, n, rmax):
 
 
 def compare_physical(pc, fc, pm, fm, n_c, n_m, rmax):
-    """Physically aligned coarse->medium comparison.
-    The regular grids make coarse point (ia,ib,ir) the medium point
-    (2ia,2ib,2ir). Fate agreement over identical physical points; boundary
-    = fate differs from an in-grid legal neighbor; boundary convergence =
-    Jaccard of coarse/medium boundary point sets projected onto common
-    physical voxels (voxel edge = 2 medium spacings)."""
+    """Physically aligned coarse->medium comparison (v3).
+
+    For every coarse point's actual physical (A,B,R), convert to the NEAREST
+    medium grid index (A/B via n_m=100; R via medium's real len(rr)=n_m-1
+    spacing over the same rmax). The coarse R grid (50 points) and medium R
+    grid (100 points) are NOT strictly nested, so no 'identical point' claim
+    is made -- the metric is named nearest-physical-grid agreement.
+
+    Metrics:
+      nearest_physical_grid_agreement -- coarse fate vs the fate of the
+        nearest medium grid point.
+      local_majority_agreement -- medium majority fate within one coarse
+        spacing (27-cell medium-index neighborhood around the nearest index)
+        vs the coarse point's fate. Resolution-convergence metric.
+      boundary_jaccard_projected -- boundary points (fate differs from a
+        legal in-grid neighbor) of each resolution projected onto common
+        physical voxels of 2 medium spacings; Jaccard of occupied voxels.
+    """
     ia_m, ib_m, ir_m = grid_index(pm, n_m, rmax)
     med = {}
     for k in range(len(pm)):
         med[(int(ia_m[k]), int(ib_m[k]), int(ir_m[k]))] = bool(fm[k])
+
+    def nearest_medium_index(A, B, R):
+        iam = int(min(max(round(A * n_m), 0), n_m))
+        ibm = int(min(max(round(B * n_m), 0), n_m))
+        irm = int(min(max(round(R / rmax * (n_m - 1)), 0), n_m - 1))
+        return iam, ibm, irm
+
+    near_ok = n_paired = n_skipped = 0
+    local_ok = local_n = 0
+    fdict_c = {}
     ia_c, ib_c, ir_c = grid_index(pc, n_c, rmax)
-    keys_c = list(zip(ia_c.tolist(), ib_c.tolist(), ir_c.tolist()))
-    paired = [(i, med[key]) for i, key in enumerate(keys_c) if key in med]
-    agree = sum(1 for i, mf in paired if bool(fc[i]) == mf) / max(len(paired), 1)
-    # local-majority agreement: medium majority fate within one coarse spacing
-    # (27-cell index neighborhood), compared with the coarse point's own fate.
-    # The identical-point subset alone only checks determinism (it is exactly 1
-    # for a deterministic system); this measures resolution convergence.
-    local_ok, local_n = 0, 0
-    for i, (ia, ib, ir) in enumerate(keys_c):
-        nb = [med[(2*ia+di, 2*ib+dj, 2*ir+dk)]
+    for k in range(len(pc)):
+        fdict_c[(int(ia_c[k]), int(ib_c[k]), int(ir_c[k]))] = bool(fc[k])
+    for k in range(len(pc)):
+        A, B, R = pc[k]
+        nidx = nearest_medium_index(A, B, R)
+        if nidx in med:
+            n_paired += 1
+            near_ok += (med[nidx] == bool(fc[k]))
+        else:
+            n_skipped += 1
+        nb = [med[(nidx[0] + di, nidx[1] + dj, nidx[2] + dk)]
               for di in (-1, 0, 1) for dj in (-1, 0, 1) for dk in (-1, 0, 1)
-              if (2*ia+di, 2*ib+dj, 2*ir+dk) in med]
+              if (nidx[0] + di, nidx[1] + dj, nidx[2] + dk) in med]
         if len(nb) >= 8:
             local_n += 1
-            maj = sum(nb) >= len(nb) / 2
-            local_ok += (maj == bool(fc[i]))
+            local_ok += ((sum(nb) >= len(nb) / 2) == bool(fc[k]))
+    near_agree = near_ok / max(n_paired, 1)
     local_agree = local_ok / max(local_n, 1)
 
-    def boundary_set(keys, fates, n):
-        fdict = dict(zip(keys, fates))
-        bset = set()
+    def boundary_set(fdict):
+        b = set()
         for key, f in fdict.items():
-            for d in ((1,0,0),(-1,0,0),(0,1,0),(0,-1,0),(0,0,1),(0,0,-1)):
-                nb = fdict.get((key[0]+d[0], key[1]+d[1], key[2]+d[2]))
+            for d in ((1, 0, 0), (-1, 0, 0), (0, 1, 0), (0, -1, 0),
+                      (0, 0, 1), (0, 0, -1)):
+                nb = fdict.get((key[0] + d[0], key[1] + d[1], key[2] + d[2]))
                 if nb is not None and nb != f:
-                    bset.add(key)
+                    b.add(key)
                     break
-        return bset
+        return b
 
-    b_c = boundary_set(keys_c, [bool(f) for f in fc], n_c)
-    keys_m = list(zip(ia_m.tolist(), ib_m.tolist(), ir_m.tolist()))
-    b_m = boundary_set(keys_m, [bool(f) for f in fm], n_m)
+    b_c = boundary_set(fdict_c)
+    b_m = boundary_set(med)
 
-    def to_voxels(bset, n):
-        # project index-space boundary points onto common physical voxels of
-        # 2 medium spacings: coarse idx * (n_m/n_c) then //2; medium idx //2
-        return {tuple(np.round(np.array(k) * (n_m / n_c) / 2).astype(int)) for k in bset}
+    def to_voxel_coarse(key):
+        A, B, R = key[0] / n_c, key[1] / n_c, key[2] / (n_c - 1) * rmax
+        return (int(round(A * n_m / 2)), int(round(B * n_m / 2)),
+                int(round(R / rmax * (n_m - 1) / 2)))
 
-    v_c = {tuple(np.round(np.array(k) * (n_m / n_c) / 2).astype(int)) for k in b_c}
-    v_m = {tuple(np.round(np.array(k) / 2).astype(int)) for k in b_m}
+    def to_voxel_medium(key):
+        A, B, R = key[0] / n_m, key[1] / n_m, key[2] / (n_m - 1) * rmax
+        return (int(round(A * n_m / 2)), int(round(B * n_m / 2)),
+                int(round(R / rmax * (n_m - 1) / 2)))
+
+    v_c = {to_voxel_coarse(k) for k in b_c}
+    v_m = {to_voxel_medium(k) for k in b_m}
     inter = len(v_c & v_m)
     union = len(v_c | v_m)
     jac = inter / union if union else 1.0
-    print(f"  coarse->medium PHYSICAL comparison: identical-point fate "
-          f"agreement = {agree:.4f} (n={len(paired)}) -- determinism check ; "
-          f"local-majority agreement = {local_agree:.4f} (n={local_n}) "
-          f"[resolution-convergence metric]")
-    print(f"  boundary points: coarse={len(b_c)} medium={len(b_m)}; "
-          f"projected-voxel Jaccard = {jac:.3f} (voxel = 2 medium spacings)")
-    return agree, jac, len(paired), len(b_c), len(b_m), local_agree
+    print(f"  coarse->medium (physical): nearest-physical-grid agreement = "
+          f"{near_agree:.4f} (n={n_paired}, skipped={n_skipped}) ; "
+          f"local-majority agreement = {local_agree:.4f} (n={local_n}) ; "
+          f"boundary Jaccard = {jac:.3f} (coarse bnd={len(b_c)}, medium "
+          f"bnd={len(b_m)}, voxel = 2 medium spacings)")
+    return near_agree, jac, n_paired, len(b_c), len(b_m), local_agree, n_skipped
 
 
 # ---------------- Map B ----------------
@@ -218,18 +244,34 @@ def reachable_atlas(eps, fp, n_ero=21, T=300.0, dt=0.02, record_every=4):
 
 
 # ---------------- Atlas horizon recheck ----------------
-def horizon_recheck(eps, pts, n_band=2000, n_ctrl=1000, seed=7):
-    """Reclassify boundary-band samples (A+B in [0.05,0.30]) and random
-    controls at T=150/600/2400; report drift rate and drift mass bands."""
+def horizon_recheck(eps, pts, fate, n_bnd=2000, n_ctrl=1000, seed=7):
+    """Reclassify TRUE boundary points (fate differs from at least one legal
+    in-grid neighbor in the medium fate grid) and non-boundary controls at
+    T=150/600/2400; report drift rate and drift locations."""
     rng = np.random.default_rng(seed)
-    mass = pts[:, 0] + pts[:, 1]
-    band = np.flatnonzero((mass >= 0.05) & (mass <= 0.30))
-    rest = np.flatnonzero((mass < 0.05) | (mass > 0.30))
-    sel_band = rng.choice(band, min(n_band, len(band)), replace=False)
-    sel_ctrl = rng.choice(rest, min(n_ctrl, len(rest)), replace=False)
-    sel = np.concatenate([sel_band, sel_ctrl])
-    is_band = np.zeros(len(sel), bool)
-    is_band[:len(sel_band)] = True
+    ia, ib, ir = grid_index(pts, 100, r_bound(eps) * 1.05)
+    fdict, cdict = {}, {}
+    for k in range(len(pts)):
+        key = (int(ia[k]), int(ib[k]), int(ir[k]))
+        fdict[key] = bool(fate[k])
+        cdict[key] = k
+    bnd = []
+    for key, f in fdict.items():
+        for d in ((1, 0, 0), (-1, 0, 0), (0, 1, 0), (0, -1, 0), (0, 0, 1), (0, 0, -1)):
+            nb = fdict.get((key[0] + d[0], key[1] + d[1], key[2] + d[2]))
+            if nb is not None and nb != f:
+                bnd.append(key)
+                break
+    bnd_idx = np.array([cdict[k] for k in bnd])
+    all_idx = np.array([cdict[k] for k in fdict])
+    isb = np.zeros(len(all_idx), bool)
+    isb[bnd_idx] = True
+    sel_b = rng.choice(bnd_idx, min(n_bnd, len(bnd_idx)), replace=False)
+    ctrl_pool = all_idx[~isb]
+    sel_c = rng.choice(ctrl_pool, min(n_ctrl, len(ctrl_pool)), replace=False)
+    sel = np.concatenate([sel_b, sel_c])
+    is_boundary = np.concatenate([np.ones(len(sel_b), bool),
+                                  np.zeros(len(sel_c), bool)])
     states = np.vstack([pts[sel, 0], pts[sel, 1],
                         1.0 - pts[sel, 0] - pts[sel, 1], pts[sel, 2]])
     fates = {}
@@ -242,20 +284,28 @@ def horizon_recheck(eps, pts, n_band=2000, n_ctrl=1000, seed=7):
     d150_600 = fates[150.0] != fates[600.0]
     d600_2400 = fates[600.0] != fates[2400.0]
     d150_2400 = fates[150.0] != fates[2400.0]
+    mass = pts[sel, 0] + pts[sel, 1]
     print(f"  horizon recheck (eps={eps:+.2f}): n={len(sel)} "
-          f"(band={is_band.sum()}, control={(~is_band).sum()})")
+          f"(TRUE boundary={int(is_boundary.sum())}, "
+          f"control={int((~is_boundary).sum())}; medium boundary points "
+          f"total={len(bnd)})")
     print(f"   drift 150->600: {d150_600.mean()*100:.2f}%  "
           f"600->2400: {d600_2400.mean()*100:.2f}%  "
           f"150->2400: {d150_2400.mean()*100:.2f}%")
-    drift_mass = mass[sel][d150_2400]
-    if len(drift_mass):
-        print(f"   drift locations (A+B): "
-              f"{np.round(np.quantile(drift_mass, [0, .25, .5, .75, 1]), 3)}")
-    return {'n': int(len(sel)), 'band': int(is_band.sum()),
+    for tag, m in (('boundary', is_boundary), ('control', ~is_boundary)):
+        dm = d150_2400 & m
+        print(f"   drift 150->2400 @{tag}: {dm.sum()}/{m.sum()}"
+              + (f"  at A+B "
+                 f"{np.round(np.quantile(mass[dm], [0, .5, 1]), 3)}"
+                 if dm.sum() else ""))
+    return {'n': int(len(sel)),
+            'n_boundary_true': int(is_boundary.sum()),
+            'n_medium_boundary_total': int(len(bnd)),
             'drift_150_600': float(d150_600.mean()),
             'drift_600_2400': float(d600_2400.mean()),
             'drift_150_2400': float(d150_2400.mean()),
-            'drift_mass_values': [float(x) for x in drift_mass[:50]]}
+            'drift_150_2400_boundary': float(d150_2400[is_boundary].mean()),
+            'drift_150_2400_control': float(d150_2400[~is_boundary].mean())}
 
 
 # ---------------- main ----------------
@@ -292,18 +342,19 @@ def main():
             np.savez_compressed(mnpz, pts=pm, fate=fm, t_rec=trm, t_abs=tam,
                                 min_ab=mam, fin=finm)
         # --- fix 1: physical comparison ---
-        agree, jac, npaired, nbc, nbm, local_agree = compare_physical(
-            pc, fc, pm, fm, 50, 100, rmax)
+        near_agree, jac, npaired, nbc, nbm, local_agree, n_skipped = \
+            compare_physical(pc, fc, pm, fm, 50, 100, rmax)
         # --- fix 2: Map B from this eps's own fixed point ---
         fp = find_fixed_point(eps)
         reach = reachable_atlas(eps, fp)
         np.savez_compressed(os.path.join(OUT, f'reachable_eps{eps:+.2f}.npz'),
                             reach=reach, fp=fp)
         # --- fix 5: horizon recheck ---
-        hrc = horizon_recheck(eps, pm)
+        hrc = horizon_recheck(eps, pm, fm)
         repro[f'{eps:+.2f}'] = {
             'fixed_point': [float(x) for x in fp],
-            'identical_point_agreement': float(agree),
+            'nearest_physical_grid_agreement': float(near_agree),
+            'nearest_skipped': int(n_skipped),
             'local_majority_agreement': float(local_agree),
             'boundary_jaccard_projected': float(jac),
             'n_paired': int(npaired), 'n_boundary_coarse': int(nbc),
@@ -311,14 +362,15 @@ def main():
             'horizon_recheck': hrc,
             'r_bound': float(r_bound(eps)),
         }
-        summary.append((eps, pc, fc, trc, reach, agree, jac, fp, local_agree))
+        summary.append((eps, pc, fc, trc, reach, near_agree, jac, fp,
+                        local_agree))
 
     with open(os.path.join(OUT, 'atlas0_repro.json'), 'w', encoding='utf-8') as f:
         json.dump(repro, f, indent=1, ensure_ascii=False)
 
     # ---- figures (regenerated) ----
     rng = np.random.default_rng(0)
-    for eps, pc, fc, trc, reach, agree, jac, fp, _ in summary:
+    for eps, pc, fc, trc, reach, near_agree, jac, fp, _ in summary:
         data = None
         A, B, R = pc[:, 0], pc[:, 1], pc[:, 2]
         fate = fc
@@ -376,7 +428,7 @@ def main():
         ax.set_title('recovery-time layers (formal, coarse)')
 
         fig.suptitle(f'Soul-0 Atlas-0 / eps={eps:+.2f} '
-                     f'[identical-point agree={agree:.3f}, '
+                     f'[nearest-grid agree={near_agree:.3f}, '
                      f'boundary Jaccard={jac:.3f}]')
         fig.tight_layout()
         fig.savefig(os.path.join(OUT, f'atlas_eps{eps:+.2f}.png'), dpi=120)
@@ -385,7 +437,7 @@ def main():
     # ---- fix 6: interactive 3D HTML (visualization only) ----
     try:
         import plotly.graph_objects as go
-        for eps, pc, fc, trc, reach, agree, jac, fp, _ in summary:
+        for eps, pc, fc, trc, reach, near_agree, jac, fp, _ in summary:
             sub = rng.choice(len(pc), min(8000, len(pc)), replace=False)
             fig = go.Figure()
             f = fc[sub]
@@ -409,7 +461,7 @@ def main():
                 scene=dict(xaxis_title='A', yaxis_title='B', zaxis_title='R'),
                 legend=dict(itemsizing='constant'))
             fig.write_html(os.path.join(OUT, f'atlas3d_eps{eps:+.2f}.html'),
-                           include_plotlyjs='cdn')
+                           include_plotlyjs=True)
         print('  interactive HTML written (3 eps)')
     except Exception as e:
         print(f'  (interactive HTML skipped: {e})')

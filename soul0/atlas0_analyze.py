@@ -62,20 +62,30 @@ def flip_surface(eps):
 
 def gap_bands(eps, rmax):
     """Reachability shortfall by (A+B, R) band under the CURRENT protocol:
-    equilibrium -> single mass-conserving erosion -> free run. 'far' = no
-    reachable sample within 0.05. This is protocol-relative, NOT a claim of
-    unreachability in any absolute sense."""
+    equilibrium -> single mass-conserving erosion -> free run. Distance is
+    measured in NORMALIZED coordinates (A, B, R/rmax) and expressed in
+    medium-grid-spacing units; three scales (1x/2x/3x spacing) are reported.
+    Only bands far at ALL three scales are Gap-01 candidates. This is
+    protocol-relative, NOT a claim of unreachability in any absolute sense."""
     md = np.load(os.path.join(OUT, f'formal_medium_eps{eps:+.2f}.npz'))
     pts, fate = md['pts'], md['fate']
     rd = np.load(os.path.join(OUT, f'reachable_eps{eps:+.2f}.npz'))
     reach, fp = rd['reach'], rd['fp']
     step = max(1, len(reach) // 40000)
     rs = reach[::step]
-    far = np.zeros(len(pts), bool)
-    for i in range(0, len(pts), 4000):
-        ch = pts[i:i + 4000]
-        d2 = ((ch[:, None, :] - rs[None, :, :]) ** 2).sum(-1)
-        far[i:i + 4000] = d2.min(1) >= 0.05 ** 2
+    # normalized coordinates
+    pn = np.vstack([pts[:, 0], pts[:, 1], pts[:, 2] / rmax]).T
+    rn = np.vstack([rs[:, 0], rs[:, 1], rs[:, 2] / rmax]).T
+    mind = np.full(len(pts), np.inf)
+    sp = 1.0 / 100.0          # one medium grid spacing in normalized units
+    thr = (1.0 * sp, 2.0 * sp, 3.0 * sp)
+    for i in range(0, len(pts), 2000):
+        ch = pn[i:i + 2000]
+        d2 = ((ch[:, None, :] - rn[None, :, :]) ** 2).sum(-1)
+        mind[i:i + 2000] = np.sqrt(d2.min(1))
+    far1 = mind > thr[0]
+    far2 = mind > thr[1]
+    far3 = mind > thr[2]
     S = pts[:, 0] + pts[:, 1]
     rows = []
     for mlo, mhi in [(0.0, 0.1), (0.1, 0.3), (0.3, 0.5), (0.5, 0.9), (0.9, 1.01)]:
@@ -84,14 +94,15 @@ def gap_bands(eps, rmax):
             if sel.sum() < 50:
                 continue
             rows.append([mlo, mhi, rlo, rhi, int(sel.sum()),
-                         float(far[sel].mean()),
+                         float(far1[sel].mean()), float(far2[sel].mean()),
+                         float(far3[sel].mean()),
                          float(fate[sel].mean())])
     path = os.path.join(OUT, f'gap_bands_eps{eps:+.2f}.csv')
     with open(path, 'w', newline='', encoding='utf-8') as f:
         w = csv.writer(f)
         w.writerow(['A+B lo', 'A+B hi', 'R lo', 'R hi', 'n_formal',
-                    'far_from_reachable_frac(T=300 protocol)',
-                    'recovered_frac'])
+                    'far_frac_1x_spacing', 'far_frac_2x_spacing',
+                    'far_frac_3x_spacing', 'recovered_frac'])
         w.writerows(rows)
     return rows
 
@@ -104,14 +115,28 @@ def main():
         rmax = 1.05 * (1.0 + max(eps, 0.0)) * K / (27 * MU)
         g = gap_bands(eps, rmax)
         cf = [(round(s, 3), round(r, 3)) for s, r in clean]
-        high_far = [r for r in g if r[1] >= 0.1 and r[3] < 3.0 and r[5] >= 0.995]
+        # separate R-band reporting for the mid/high-mass region (fix #2)
+        mid_lowR = [r for r in g if r[0] >= 0.1 and r[2] == 0.0]
+        mid_midR = [r for r in g if r[0] >= 0.1 and r[2] == 1.0]
+        gap1_lowR = [r for r in mid_lowR
+                     if r[5] >= 0.995 and r[6] >= 0.995 and r[7] >= 0.995]
+        gap1_midR = [r for r in mid_midR
+                     if r[5] >= 0.995 and r[6] >= 0.995 and r[7] >= 0.995]
         print(f"eps={eps:+.2f}: clean flip thresholds (A+B, R) = {cf[:8]}"
               f"{' ...' if len(cf) > 8 else ''}  (n_clean={len(cf)})")
-        print(f"  protocol-unvisited bands (A+B>=0.1, R<3, far>=99.5%): "
-              f"{len(high_far)}/{sum(1 for r in g if r[1] >= 0.1 and r[3] < 3.0)}")
+        print(f"  protocol-unvisited (far>=99.5% at ALL of 1x/2x/3x spacing):"
+              f"  A+B>=0.1 & 0<=R<1 : {len(gap1_lowR)}/{len(mid_lowR)} bands"
+              f"  ;  A+B>=0.1 & 1<=R<3 : {len(gap1_midR)}/{len(mid_midR)} bands")
+        for r in gap1_lowR + gap1_midR:
+            print(f"   band A+B[{r[0]},{r[1]}) R[{r[2]},{r[3]}): far "
+                  f"{r[5]*100:.1f}/{r[6]*100:.1f}/{r[7]*100:.1f}%  n={r[4]}")
         out[f'{eps:+.2f}'] = {
             'clean_flips': cf, 'n_flip_bins': len(rows),
-            'gap_bands': g, 'n_high_far_bands': len(high_far),
+            'gap_bands': g,
+            'n_gap1_candidates_lowR': len(gap1_lowR),
+            'n_bands_lowR': len(mid_lowR),
+            'n_gap1_candidates_midR': len(gap1_midR),
+            'n_bands_midR': len(mid_midR),
         }
     with open(os.path.join(OUT, 'atlas0_analysis.json'), 'w', encoding='utf-8') as f:
         json.dump(out, f, indent=1, ensure_ascii=False)
