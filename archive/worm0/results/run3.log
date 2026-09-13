@@ -1,0 +1,118 @@
+  seed0 full     W1: err_ema=0.0312 C=-0.036 energy=1.00 syncope+=0 appr=+0.027 pulses=220
+  seed0 full     I1: err_ema=0.0312 C=-0.030 energy=1.00 syncope+=0 appr=+0.000 pulses=220
+  seed0 full     W2: err_ema=0.0389 C=-0.050 energy=1.00 syncope+=0 appr=+0.197 pulses=440
+  seed0 full     W3: err_ema=0.0370 C=-0.064 energy=1.00 syncope+=0 appr=+0.635 pulses=660
+  seed0 full     I2: err_ema=0.0370 C=-0.051 energy=1.00 syncope+=0 appr=+0.000 pulses=660
+  seed0 full     W4: err_ema=0.0392 C=-0.049 energy=1.00 syncope+=0 appr=+0.662 pulses=880
+  seed1 full     W1: err_ema=0.0407 C=-0.102 energy=1.00 syncope+=1 appr=+0.035 pulses=210
+  seed1 full     I1: err_ema=0.0407 C=-0.066 energy=1.00 syncope+=0 appr=+0.000 pulses=210
+  seed1 full     W2: err_ema=0.0600 C=-0.051 energy=1.00 syncope+=0 appr=+0.010 pulses=430
+  seed1 full     W3: err_ema=0.0294 C=-0.080 energy=0.95 syncope+=0 appr=+0.001 pulses=650
+  seed1 full     I2: err_ema=0.0294 C=-0.070 energy=0.95 syncope+=0 appr=+0.000 pulses=650
+  seed1 full     W4: err_ema=0.0306 C=-0.062 energy=0.90 syncope+=0 appr=+0.000 pulses=870
+  seed2 full     W1: err_ema=0.0355 C=-0.074 energy=0.43 syncope+=7 appr=-0.043 pulses=150
+  seed2 full     I1: err_ema=0.0355 C=-0.032 energy=0.43 syncope+=0 appr=+0.000 pulses=150
+  seed2 full     W2: err_ema=0.0320 C=-0.042 energy=0.38 syncope+=0 appr=-0.094 pulses=370
+  seed2 full     W3: err_ema=0.0296 C=-0.058 energy=0.83 syncope+=0 appr=+0.165 pulses=590
+  seed2 full     I2: err_ema=0.0296 C=-0.044 energy=0.83 syncope+=0 appr=+0.000 pulses=590
+  seed2 full     W4: err_ema=0.0241 C=-0.051 energy=1.00 syncope+=0 appr=+0.177 pulses=810
+  seed3 full     W1: err_ema=0.0390 C=-0.139 energy=1.00 syncope+=1 appr=+0.170 pulses=210
+  seed3 full     I1: err_ema=0.0390 C=-0.044 energy=1.00 syncope+=0 appr=+0.000 pulses=210
+  seed3 full     W2: err_ema=0.0632 C=-0.046 energy=1.00 syncope+=0 appr=+0.313 pulses=430
+  seed3 full     W3: err_ema=0.0401 C=-0.137 energy=0.96 syncope+=0 appr=+0.016 pulses=650
+  seed3 full     I2: err_ema=0.0401 C=-0.086 energy=0.96 syncope+=0 appr=+0.000 pulses=650
+  seed3 full     W4: err_ema=0.0416 C=-0.118 energy=0.91 syncope+=0 appr=+0.002 pulses=870
+  seed4 full     W1: err_ema=0.0514 C=-0.038 energy=0.37 syncope+=0 appr=-0.218 pulses=220
+  seed4 full     I1: err_ema=0.0514 C=-0.046 energy=0.37 syncope+=0 appr=+0.000 pulses=220
+  seed4 full     W2: err_ema=0.0626 C=-0.055 energy=0.32 syncope+=0 appr=-0.230 pulses=440
+  seed4 full     W3: err_ema=0.0639 C=-0.073 energy=1.00 syncope+=0 appr=+0.297 pulses=660
+  seed4 full     I2: err_ema=0.0639 C=-0.060 energy=1.00 syncope+=0 appr=+0.000 pulses=660
+  seed4 full     W4: err_ema=0.0673 C=-0.068 energy=1.00 syncope+=0 appr=+0.322 pulses=880
+  seed0 uniform  W1: err_ema=0.0330 C=-0.032 energy=1.00 syncope+=0 appr=+0.489 pulses=220
+  seed0 uniform  I1: err_ema=0.0330 C=-0.033 energy=1.00 syncope+=0 appr=+0.000 pulses=220
+  seed0 uniform  W2: err_ema=0.0425 C=-0.044 energy=1.00 syncope+=0 appr=+0.541 pulses=440
+  seed0 uniform  W3: err_ema=0.0436 C=-0.072 energy=1.00 syncope+=0 appr=+0.735 pulses=660
+  seed0 uniform  I2: err_ema=0.0436 C=-0.065 energy=1.00 syncope+=0 appr=+0.000 pulses=660
+  seed0 uniform  W4: err_ema=0.0458 C=-0.063 energy=1.00 syncope+=0 appr=+0.744 pulses=880
+  seed1 uniform  W1: err_ema=0.0332 C=-0.115 energy=0.39 syncope+=6 appr=+0.008 pulses=160
+  seed1 uniform  I1: err_ema=0.0332 C=-0.041 energy=0.39 syncope+=0 appr=+0.000 pulses=160
+  seed1 uniform  W2: err_ema=0.0248 C=-0.043 energy=0.39 syncope+=0 appr=-0.011 pulses=380
+  seed1 uniform  W3: err_ema=0.0385 C=-0.048 energy=0.35 syncope+=0 appr=-0.156 pulses=600
+  seed1 uniform  I2: err_ema=0.0385 C=-0.049 energy=0.35 syncope+=0 appr=+0.000 pulses=600
+  seed1 uniform  W4: err_ema=0.0532 C=-0.057 energy=0.30 syncope+=0 appr=-0.164 pulses=820
+  seed2 uniform  W1: err_ema=0.0203 C=-0.019 energy=0.45 syncope+=13 appr=+0.000 pulses=99
+  seed2 uniform  I1: err_ema=0.0203 C=-0.014 energy=0.45 syncope+=0 appr=+0.000 pulses=99
+  seed2 uniform  W2: err_ema=0.0158 C=-0.016 energy=0.31 syncope+=11 appr=+0.000 pulses=200
+  seed2 uniform  W3: err_ema=0.0135 C=-0.031 energy=0.45 syncope+=5 appr=+0.032 pulses=374
+  seed2 uniform  I2: err_ema=0.0135 C=-0.031 energy=0.45 syncope+=0 appr=+0.000 pulses=374
+  seed2 uniform  W4: err_ema=0.0311 C=-0.138 energy=0.45 syncope+=2 appr=-0.029 pulses=570
+  seed3 uniform  W1: err_ema=0.0464 C=-0.042 energy=1.00 syncope+=0 appr=+0.078 pulses=220
+  seed3 uniform  I1: err_ema=0.0464 C=-0.042 energy=1.00 syncope+=0 appr=+0.000 pulses=220
+  seed3 uniform  W2: err_ema=0.0611 C=-0.048 energy=1.00 syncope+=0 appr=+0.082 pulses=440
+  seed3 uniform  W3: err_ema=0.0361 C=-0.087 energy=0.95 syncope+=0 appr=+0.005 pulses=660
+  seed3 uniform  I2: err_ema=0.0361 C=-0.059 energy=0.95 syncope+=0 appr=+0.000 pulses=660
+  seed3 uniform  W4: err_ema=0.0352 C=-0.062 energy=0.91 syncope+=0 appr=+0.001 pulses=880
+  seed4 uniform  W1: err_ema=0.0529 C=-0.041 energy=0.57 syncope+=0 appr=-0.262 pulses=220
+  seed4 uniform  I1: err_ema=0.0529 C=-0.037 energy=0.57 syncope+=0 appr=+0.000 pulses=220
+  seed4 uniform  W2: err_ema=0.0677 C=-0.049 energy=0.52 syncope+=0 appr=-0.276 pulses=440
+  seed4 uniform  W3: err_ema=0.0882 C=-0.069 energy=0.93 syncope+=0 appr=-0.125 pulses=660
+  seed4 uniform  I2: err_ema=0.0882 C=-0.058 energy=0.93 syncope+=0 appr=+0.000 pulses=660
+  seed4 uniform  W4: err_ema=0.1010 C=-0.072 energy=1.00 syncope+=0 appr=-0.118 pulses=880
+  seed0 none     W1: err_ema=0.0297 C=-0.059 energy=0.25 syncope+=4 appr=+0.011 pulses=180
+  seed0 none     I1: err_ema=0.0297 C=-0.065 energy=0.25 syncope+=0 appr=+0.000 pulses=180
+  seed0 none     W2: err_ema=0.0224 C=-0.042 energy=0.23 syncope+=0 appr=-0.001 pulses=400
+  seed0 none     W3: err_ema=0.0700 C=-0.070 energy=0.19 syncope+=0 appr=-0.388 pulses=620
+  seed0 none     I2: err_ema=0.0700 C=-0.066 energy=0.19 syncope+=0 appr=+0.000 pulses=620
+  seed0 none     W4: err_ema=0.1023 C=-0.084 energy=0.14 syncope+=0 appr=-0.406 pulses=840
+  seed1 none     W1: err_ema=0.0345 C=-0.043 energy=1.00 syncope+=0 appr=+0.030 pulses=220
+  seed1 none     I1: err_ema=0.0345 C=-0.044 energy=1.00 syncope+=0 appr=+0.000 pulses=220
+  seed1 none     W2: err_ema=0.0434 C=-0.047 energy=1.00 syncope+=0 appr=+0.061 pulses=440
+  seed1 none     W3: err_ema=0.0223 C=-0.058 energy=0.95 syncope+=0 appr=+0.003 pulses=660
+  seed1 none     I2: err_ema=0.0223 C=-0.058 energy=0.95 syncope+=0 appr=+0.000 pulses=660
+  seed1 none     W4: err_ema=0.0211 C=-0.048 energy=0.90 syncope+=0 appr=+0.000 pulses=880
+  seed2 none     W1: err_ema=0.0406 C=-0.046 energy=0.31 syncope+=3 appr=-0.054 pulses=190
+  seed2 none     I1: err_ema=0.0406 C=-0.044 energy=0.31 syncope+=0 appr=+0.000 pulses=190
+  seed2 none     W2: err_ema=0.0274 C=-0.037 energy=0.26 syncope+=0 appr=-0.072 pulses=410
+  seed2 none     W3: err_ema=0.0406 C=-0.077 energy=1.00 syncope+=0 appr=+0.356 pulses=630
+  seed2 none     I2: err_ema=0.0406 C=-0.069 energy=1.00 syncope+=0 appr=+0.000 pulses=630
+  seed2 none     W4: err_ema=0.0395 C=-0.059 energy=1.00 syncope+=0 appr=+0.376 pulses=850
+  seed3 none     W1: err_ema=0.0374 C=-0.075 energy=1.00 syncope+=0 appr=+0.360 pulses=220
+  seed3 none     I1: err_ema=0.0374 C=-0.078 energy=1.00 syncope+=0 appr=+0.000 pulses=220
+  seed3 none     W2: err_ema=0.0476 C=-0.056 energy=1.00 syncope+=0 appr=+0.472 pulses=440
+  seed3 none     W3: err_ema=0.0414 C=-0.109 energy=0.95 syncope+=0 appr=-0.102 pulses=660
+  seed3 none     I2: err_ema=0.0414 C=-0.105 energy=0.95 syncope+=0 appr=+0.000 pulses=660
+  seed3 none     W4: err_ema=0.0496 C=-0.078 energy=0.90 syncope+=0 appr=-0.129 pulses=880
+  seed4 none     W1: err_ema=0.0109 C=-0.016 energy=0.15 syncope+=11 appr=+0.000 pulses=110
+  seed4 none     I1: err_ema=0.0109 C=-0.018 energy=0.15 syncope+=0 appr=+0.000 pulses=110
+  seed4 none     W2: err_ema=0.0097 C=-0.012 energy=0.25 syncope+=9 appr=+0.008 pulses=240
+  seed4 none     W3: err_ema=0.0098 C=-0.012 energy=0.45 syncope+=12 appr=+0.001 pulses=344
+  seed4 none     I2: err_ema=0.0098 C=-0.013 energy=0.45 syncope+=0 appr=+0.000 pulses=344
+  seed4 none     W4: err_ema=0.0091 C=-0.011 energy=0.11 syncope+=10 appr=+0.003 pulses=460
+========================================================================
+E0 offline-thinking experiment   (FULL, 5 seeds/arm)
+========================================================================
+metric                                full       uniform          none
+rel_gain1                      -0.062±0.06    0.012±0.15    0.067±0.15
+rel_gain2                      -0.003±0.04   -0.012±0.07   -0.040±0.08
+syn_W1                          1.800±2.64    3.800±5.15    3.600±4.03
+syn_W2                          0.000±0.00    2.200±4.40    1.800±3.60
+syn_W3                          0.000±0.00    1.000±2.00    2.400±4.80
+syn_W4                          0.000±0.00    0.400±0.80    2.000±4.00
+recovery_W3                   57.800±28.36 191.400±216.32 771.600±914.54
+appr_W1                        -0.006±0.13    0.063±0.24    0.070±0.15
+appr_W2                         0.039±0.20    0.067±0.27    0.093±0.19
+appr_W3                         0.223±0.23    0.098±0.33   -0.026±0.24
+appr_W4                         0.233±0.25    0.087±0.33   -0.031±0.25
+ent_ext_idle                    0.000±0.00    0.000±0.00    0.000±0.00
+ent_ext_wake                    5.002±0.60    4.506±1.17    4.039±1.62
+cos_before                      0.116±0.28    0.549±0.17    0.000±0.00
+cos_during                      0.258±0.29    0.581±0.18    0.000±0.00
+------------------------------------------------------------------------
+[FAIL] S1  offline gain (full vs none)    rel_gain1 full=-0.062 uniform=0.012 none=0.067
+[FAIL] S1' selection value (full vs uniform) diff=-0.074
+[FAIL] S2  behavior change (syncope drop) reduction full=1.80 none=1.80
+[PASS] S3  strategy transfer (W3 recovery) recovery_W3 full=58 none=772
+[PASS] S4  structured idle (pulse cos)    cos during=0.258 before=0.116 delta=0.143
+------------------------------------------------------------------------
+S0  info audit: EXTEROceptive entropy bits/tick  wake=5.00  idle=0.00  (idle~0 means gains cannot come from new info; intero idle=0.42)
+figure -> results/figure_e0.png

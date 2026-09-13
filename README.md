@@ -1,47 +1,37 @@
-# Worm-0：持续运行的认知内核 v0
+# 小夕 / Soul-0
 
-> **状态（2026-09-13）：Worm-0 已冻结（tag `worm0-frozen`），不再修改。**
-> 阶段结论：E0（FINDINGS_v0）→ 审计（PRESET_AUDIT）→ M0-minus 减法消融与测量补遗
-> （FINDINGS_M0MINUS，含对早前结论的两轮修正）。最终图景：所有像认知的东西都有程序员指纹；
-> 内核连续状态的有效足迹极小（与旧状态余弦中位 0.975–0.998），"自发回忆"作为事件不可定义。
-> 下一阶段方向：**Soul-0**（「存在域 Existence Domain」/「存在边界 Existence Boundary」）
-> ——当前仅为概念阶段，未设计、未实现。
+探索性研究项目：**一个计算结构要满足什么条件，才算拥有了"自身的存在条件"。**
 
-研究"代码怎样产生'想'"：一个外界输入只是扰动、不是启动信号的认知内核。
-即使没有新信息，记忆再激活、世界模型预测、未解决的误差、学习进度也持续改变内部状态。
+当前路线是探索性的、候选性的。我们不声称已经实现生命、意识、主体或任何类似物；
+所有结论都限定在明确的实验判据之内。
 
-- 研究问题、公理、判据：[RESEARCH_PLAN.md](RESEARCH_PLAN.md)
-- 先行者源码调查：[PRIOR_WORK.md](PRIOR_WORK.md)
-- v0 实验结论：[FINDINGS_v0.md](FINDINGS_v0.md)
-- 人工预置机制审计：[PRESET_AUDIT.md](PRESET_AUDIT.md)
-- M0-minus 减法实验与收档：[M0_MINUS_DESIGN.md](M0_MINUS_DESIGN.md) / [FINDINGS_M0MINUS.md](FINDINGS_M0MINUS.md)
+## 现在在哪
 
-## 运行
+| 想看什么 | 去哪里 |
+|---|---|
+| 当前研究代码 | [`soul0/`](soul0/) |
+| 研究文档（按顺序阅读） | [`docs/soul0/README.md`](docs/soul0/README.md) |
+| 全部实验结果数据 | [`results/`](results/) |
+| **可交互 3D 观察台（双击即开）** | [`results/soul0_observatory/index.html`](results/soul0_observatory/index.html) |
+| 旧路线 Worm-0（已冻结） | [`archive/worm0/`](archive/worm0/) |
 
-```
-python -m pip install numpy matplotlib   # matplotlib 仅画图用
-python tools/gradcheck.py                # 手写反传的有限差分校验
-python src/experiment.py --quick --seeds 1   # 冒烟（~10 秒）
-python src/experiment.py --seeds 3           # 全量 E0（几分钟）
-```
+## 项目进展（截至 2026-09）
 
-结果输出到 `results/`：verdicts.txt（S1–S4 判定）、summary.csv、ticks.csv、figure_e0.png。
+- **E0 / E0.5 / E1 已收档**：构造了最小存在组织 Proto-0（两个组分互相维持、
+  越界即不可逆消散），审计了它的内部差分响应，并实现了一个由组织自身产生、
+  带有自己动态、能反向调制自维持过程的内部调节自由度（判据逐条验证通过）。
+- **Atlas-0 已完成首轮状态空间观察**：把系统 100 万+ 状态点画成地图，
+  分清了"数学上允许的状态"与"历史实际到过的状态"。
+- **Observatory 已上线**：不想看代码的话，双击观察台直接用鼠标看系统怎么运动。
 
-## 结构
+## 研究纪律（贯穿所有阶段）
 
-```
-src/world.py      虫世界：物理后果 only（能量/完整度/晕厥/麻痹），无标签无奖励
-src/kernel.py     固定随机 recurrent 内核，每拍必跑（时间恒在流动）
-src/memory.py     情景记忆：h 为键，检索→再激活电流；晕厥修剪
-src/nets.py       两层 MLP 手写反传（世界模型 + ΔC 预测器）
-src/brain.py      经验在线分区 + 学习进度 + 回放分配 bandit（探究欲所在）
-src/agent.py      接线：策略=想象 rollout 打分（想象不进训练）；关切广播
-src/experiment.py E0 协议：醒-冻-醒-变-醒-冻-醒，三臂对照，S1–S4 自动判定
-tools/gradcheck.py
-```
+每加入一个机制都要回答：这是世界规则、先天结构、后天形成，还是观察者起的名字？
+是研究者人为规定的，它是否偷偷回答了本来应该研究的问题？
+当前所有实验不含 reward、生存奖励、好坏标签、目标函数。
 
-## 无标签审计（代码里可验证）
+## 历史
 
-进入大脑的训练信号只有三种：自监督预测误差、认知资本 C 的实测变化、
-回放选择的内部误差下降奖励。世界真值（营养/毒物位置、物质身份）只用于
-实验者的事后测量，从不进入大脑。
+Worm-0（认知内核路线）已完整冻结归档于 [`archive/worm0/`](archive/worm0/)，
+包括其代码、文档与全部实验结果。它的教训（过早安装目标与课表会把程序员安排的
+东西误认为自主认知）写在 `archive/worm0/PRESET_AUDIT.md`。
